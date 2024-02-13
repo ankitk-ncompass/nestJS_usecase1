@@ -40,9 +40,10 @@ export class AuthService {
     }
 
     async forgetPassword(user:{email: string, name: string}){
-        const userId = await this.usersRepositry.createQueryBuilder('users').select('users.id')
+        const userId = await this.usersRepositry.createQueryBuilder('users').select()
         .where('users.email = :email AND users.name = :name', {email: user.email, name: user.name}).getOne();
 
+        console.log(userId)
         if(userId){
             const otp = otpGenerator.generate(6, {lowerCaseAlphabets: false, specialChars: false });
 
@@ -50,7 +51,10 @@ export class AuthService {
             const date = new Date();
             const userID = userId.id;
             const payload = {id:userID, email:emailPayload, otp:otp, createdAt:date}
-            this.saveInTable(payload)
+            const isInserted = await this.authRepository.save(payload)
+            userId.authTable = isInserted;
+
+            this.usersRepositry.save(userId)
 
             return otp;
         }   
@@ -59,14 +63,13 @@ export class AuthService {
         }
     }
 
-    saveInTable(payload){
-        const isInserted = this.authRepository.save(payload)
-    }
 
     async resetPassword(user:{id:number, otp: string, newPassword: string}){
         const userId = await this.authRepository.createQueryBuilder('authTable').select(['authTable.id', 'authTable.createdAt'])
         .where('authTable.id = :id AND authTable.otp = :otp', {id: user.id, otp: user.otp}).getOne();
         
+        if(!userId)
+            throw new NotFoundException("User credentials are wrong")
         const minutesDiff = (Date.now()/1000 - userId.createdAt.getTime()/1000)/60;
 
         const hashedPassword = md5(user.newPassword);
@@ -78,7 +81,7 @@ export class AuthService {
             if(isUpdated)
                 return isUpdated;
         }else{
-            throw new UnauthorizedException('Invalid or expired token');
+            throw new UnauthorizedException('Invalid or expired OTP');
         }
     }
 }

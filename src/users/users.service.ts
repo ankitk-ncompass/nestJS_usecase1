@@ -27,14 +27,11 @@ export class UsersService {
             const value2 = {id:user.id, password:user.password, isActive:1}
             const result2 = await this.usersPasswordRepository.save(value2)
     
-            const isActive = result2.isActive;
-            return {...result1,isActive};
+            result1.usersPassword = result2;
+            return this.usersRepository.save(result1)
+            //const isActive = result2.isActive;
+           // return result1;
         } catch (error) {
-            if (error instanceof QueryFailedError && error.message.includes('Duplicate entry')) {
-                // Handle duplicate entry error
-                throw new Error('Duplicate entry. Username must be unique.');
-              }
-              // Handle other errors or rethrow the original error
               throw error;
         }
 
@@ -42,5 +39,9 @@ export class UsersService {
 
     delete(id:number){
         return this.usersRepository.delete(id)
+    }
+
+    findAll(){
+        return this.usersRepository.find({relations:['usersPassword', 'authTable']})
     }
 }

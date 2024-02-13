@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn } from "typeorm";
 import { UsersPassword } from "./users-password.entity";
+import { AuthTable } from "src/auth/auth.entity";
 
 
 @Entity()
@@ -22,4 +23,11 @@ export class Users{
     @Column()
     phone: number
 
+    @OneToOne(() => UsersPassword)
+    @JoinColumn()
+    usersPassword: UsersPassword
+    
+    @OneToOne(() => AuthTable)
+    @JoinColumn()
+    authTable: AuthTable
 }

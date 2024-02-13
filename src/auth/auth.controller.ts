@@ -29,4 +29,6 @@ export class AuthController {
         const resp = new ApiResponse(200, {message:"Password Changed", result: result})
         return resp.apiResponse(res)
     }
+
+    
 }

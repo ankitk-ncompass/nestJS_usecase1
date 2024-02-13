@@ -13,4 +13,5 @@ export class AuthTable{
 
     @CreateDateColumn({ type: 'timestamp'})
     createdAt: Date
+
 }

@@ -11,4 +11,5 @@ export class UsersPassword{
 
     @Column({default: 1})
     isActive: number
+
 }

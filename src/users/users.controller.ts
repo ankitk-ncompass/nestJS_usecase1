@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ApiResponse } from 'src/utils/apiResponse';
 import { UsersPassword } from './users-password.entity';
@@ -21,4 +21,11 @@ export class UsersController {
     remove(@Body() id:number){
         return this.userService.delete(id)
     }
+
+    @Get("/getAll")
+    findAll(){
+        return this.userService.findAll();
+    }
+
+    
 }
